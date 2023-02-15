@@ -8,7 +8,7 @@ from .models import *
 
 from .forms import CommentForm
 from django.http import Http404
-
+import markdown
 
 def get_blogs(request):
     # 获得所有的博客按发布时间降序排
@@ -23,7 +23,13 @@ def get_details(request, blog_id):
         blog = Blog.objects.get(id=blog_id)  # 获取固定的blog_id的对象；
     except Blog.DoesNotExist:
         raise Http404
-
+    blog.content = markdown.markdown(blog.content,
+                                     extensions=[
+                                         'markdown.extensions.extra',
+                                         'markdown.extensions.codehilite',
+                                         'markdown.extensions.toc',
+                                     ])
+    print(blog)
     if request.method == 'GET':
         form = CommentForm()
     else:  # 请求方法为Post
@@ -32,9 +38,16 @@ def get_details(request, blog_id):
             cleaned_data = form.cleaned_data
             cleaned_data['blog'] = blog
             Comment.objects.create(**cleaned_data)
+
     ctx = {
         'blog': blog,
         'comments': blog.comment_set.all().order_by('-pub'),
         'form': form
     }  # 返回3个参数
     return render(request, 'blog_details.html', ctx)
+
+
+
+def get_index(request):
+
+    return render(request, 'index.html')

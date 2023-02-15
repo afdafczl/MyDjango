@@ -3,7 +3,7 @@
 """
 from __future__ import unicode_literals
 from django.db import models
-
+from mdeditor.fields import MDTextField
 
 class Category(models.Model):
     """
@@ -39,7 +39,7 @@ class Blog(models.Model):
     """
     title = models.CharField('标题', max_length=32)
     author = models.CharField('作者', max_length=16)
-    content = models.TextField('内容')
+    content = MDTextField('内容',null=True)
     pub = models.DateField('发布时间', auto_now_add=True)
     # on_delete解释：当子表中的某条数据删除后，关联的外键操作
     # on_delete = models.SET_NULL
